@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vehicle Scraper & Lister</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <h1>Vehicle Scraper & Lister</h1>
+        <p class="sub">Local-only • MV3</p>
+      </header>
+
+      <section id="summary">
+        <div class="row"><span>Source:</span><strong id="source">–</strong></div>
+        <div class="row"><span>Title:</span><strong id="title">–</strong></div>
+        <div class="row"><span>Price:</span><strong id="price">–</strong></div>
+        <div class="row"><span>Miles:</span><strong id="mileage">–</strong></div>
+        <div class="row"><span>VIN:</span><strong id="vin">–</strong></div>
+        <div class="row"><span>Photos:</span><strong id="photos">–</strong></div>
+        <div id="warn"></div>
+      </section>
+
+      <nav class="actions">
+        <button id="scrape">Scrape This Page</button>
+        <button id="openfb">Open FB & Autofill</button>
+        <button id="dlphotos">Download Photos</button>
+        <button id="full">Open Full App</button>
+      </nav>
+    </div>
+
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

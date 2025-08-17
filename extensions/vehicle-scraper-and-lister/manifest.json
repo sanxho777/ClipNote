@@ -1,0 +1,58 @@
+{
+  "manifest_version": 3,
+  "name": "Vehicle Scraper & Marketplace Lister",
+  "description": "Scrape vehicle details from listing sites and autofill Facebook Marketplace. Local-only, no backend.",
+  "version": "1.0.0",
+  "action": {
+    "default_title": "Vehicle Scraper & Lister",
+    "default_popup": "popup.html"
+  },
+  "icons": {
+    "16": "public/icons/icon16.png",
+    "32": "public/icons/icon32.png",
+    "48": "public/icons/icon48.png",
+    "128": "public/icons/icon128.png"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "permissions": ["storage", "downloads", "scripting", "activeTab"],
+  "host_permissions": [
+    "*://*.autotrader.com/*",
+    "*://*.cars.com/*",
+    "*://*.cargurus.com/*",
+    "*://*.dealer.com/*",
+    "*://*/inventory/*",
+    "*://*/vehicle/*",
+    "*://*.facebook.com/*",
+    "*://facebook.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.autotrader.com/*",
+        "*://*.cars.com/*",
+        "*://*.cargurus.com/*",
+        "*://*.dealer.com/*",
+        "*://*/inventory/*",
+        "*://*/vehicle/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["*://*.facebook.com/marketplace/*/create/*", "*://facebook.com/marketplace/*/create/*"],
+      "js": ["facebook.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [{
+    "resources": ["public/*"],
+    "matches": ["<all_urls>"]
+  }],
+  "options_page": "options.html",
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self';"
+  }
+}
