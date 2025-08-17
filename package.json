@@ -1,0 +1,34 @@
+{
+  "name": "workspace",
+  "version": "1.0.0",
+  "description": "A production-ready Chrome Extension (Manifest V3) that extracts vehicle data from automotive websites and auto-fills Facebook Marketplace vehicle listings with photos.",
+  "main": "webpack.config.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/chrome": "^0.1.4",
+    "@types/jest": "^30.0.0",
+    "@types/jsdom": "^21.1.7",
+    "@typescript-eslint/eslint-plugin": "^8.39.1",
+    "@typescript-eslint/parser": "^8.39.1",
+    "clean-webpack-plugin": "^4.0.0",
+    "copy-webpack-plugin": "^13.0.1",
+    "css-loader": "^7.1.2",
+    "eslint": "^9.33.0",
+    "jest": "^30.0.5",
+    "jsdom": "^26.1.0",
+    "prettier": "^3.6.2",
+    "style-loader": "^4.0.0",
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.9.2",
+    "webpack": "^5.101.2",
+    "webpack-cli": "^6.0.1"
+  }
+}

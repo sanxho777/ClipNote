@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vehicle Scraper & Marketplace Lister - Full App</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <span class="logo-icon">🚗</span>
+        <h1>Vehicle Scraper</h1>
+      </div>
+      
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="#inventory" class="nav-link active" data-section="inventory">
+            <span class="nav-icon">📋</span>
+            Inventory
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#analytics" class="nav-link" data-section="analytics">
+            <span class="nav-icon">📊</span>
+            Analytics
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#settings" class="nav-link" data-section="settings">
+            <span class="nav-icon">⚙️</span>
+            Settings
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#help" class="nav-link" data-section="help">
+            <span class="nav-icon">❓</span>
+            Help
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <header class="app-header">
+        <div class="header-title">
+          <h2 id="sectionTitle">Inventory</h2>
+          <p id="sectionSubtitle">Manage your scraped vehicle data</p>
+        </div>
+        
+        <div class="header-actions">
+          <button id="exportBtn" class="btn btn-outline">
+            <span class="btn-icon">📤</span>
+            Export
+          </button>
+          <button id="importBtn" class="btn btn-outline">
+            <span class="btn-icon">📥</span>
+            Import
+          </button>
+          <button id="clearBtn" class="btn btn-danger">
+            <span class="btn-icon">🗑️</span>
+            Clear All
+          </button>
+        </div>
+      </header>
+
+      <!-- Inventory Section -->
+      <section id="inventorySection" class="content-section">
+        <!-- Search and Filters -->
+        <div class="search-filters">
+          <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search vehicles..." class="search-input">
+            <button id="searchBtn" class="search-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="21 21l-4.35-4.35"></path>
+              </svg>
+            </button>
+          </div>
+          
+          <div class="filters">
+            <select id="makeFilter" class="filter-select">
+              <option value="">All Makes</option>
+            </select>
+            <select id="yearFilter" class="filter-select">
+              <option value="">All Years</option>
+            </select>
+            <select id="priceFilter" class="filter-select">
+              <option value="">All Prices</option>
+              <option value="0-20000">Under $20k</option>
+              <option value="20000-40000">$20k - $40k</option>
+              <option value="40000-60000">$40k - $60k</option>
+              <option value="60000+">$60k+</option>
+            </select>
+            <button id="clearFilters" class="btn btn-secondary">Clear</button>
+          </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">🚗</div>
+            <div class="stat-content">
+              <div class="stat-value" id="totalVehicles">0</div>
+              <div class="stat-label">Total Vehicles</div>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon">💰</div>
+            <div class="stat-content">
+              <div class="stat-value" id="avgPrice">$0</div>
+              <div class="stat-label">Average Price</div>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon">📈</div>
+            <div class="stat-content">
+              <div class="stat-value" id="totalValue">$0</div>
+              <div class="stat-label">Total Value</div>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon">📅</div>
+            <div class="stat-content">
+              <div class="stat-value" id="recentCount">0</div>
+              <div class="stat-label">This Week</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vehicle List -->
+        <div class="vehicle-list">
+          <div id="vehicleGrid" class="vehicle-grid">
+            <!-- Vehicle cards will be inserted here -->
+          </div>
+          
+          <div id="emptyState" class="empty-state hidden">
+            <div class="empty-icon">📭</div>
+            <h3>No vehicles found</h3>
+            <p>Start by scraping vehicle data from supported automotive websites.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Analytics Section -->
+      <section id="analyticsSection" class="content-section hidden">
+        <div class="analytics-grid">
+          <div class="chart-card">
+            <h3>Price Distribution</h3>
+            <canvas id="priceChart" width="400" height="200"></canvas>
+          </div>
+          
+          <div class="chart-card">
+            <h3>Make Distribution</h3>
+            <canvas id="makeChart" width="400" height="200"></canvas>
+          </div>
+          
+          <div class="chart-card">
+            <h3>Scraping Activity</h3>
+            <canvas id="activityChart" width="400" height="200"></canvas>
+          </div>
+          
+          <div class="chart-card">
+            <h3>Average Mileage by Year</h3>
+            <canvas id="mileageChart" width="400" height="200"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- Settings Section -->
+      <section id="settingsSection" class="content-section hidden">
+        <div class="settings-grid">
+          <div class="settings-card">
+            <h3>Facebook Autofill Settings</h3>
+            
+            <div class="setting-group">
+              <label for="defaultCondition">Default Condition</label>
+              <select id="defaultCondition" class="setting-input">
+                <option value="Used">Used</option>
+                <option value="New">New</option>
+                <option value="Certified Pre-Owned">Certified Pre-Owned</option>
+              </select>
+            </div>
+            
+            <div class="setting-group">
+              <label class="checkbox-label">
+                <input type="checkbox" id="uploadPhotos" checked>
+                <span class="checkbox-custom"></span>
+                Auto-upload photos to Facebook
+              </label>
+            </div>
+            
+            <div class="setting-group">
+              <label for="maxPhotos">Maximum photos to upload</label>
+              <input type="number" id="maxPhotos" class="setting-input" value="20" min="1" max="50">
+            </div>
+          </div>
+          
+          <div class="settings-card">
+            <h3>Supported Sites</h3>
+            
+            <div class="site-list">
+              <div class="site-item">
+                <label class="checkbox-label">
+                  <input type="checkbox" value="autotrader.com" checked>
+                  <span class="checkbox-custom"></span>
+                  AutoTrader.com
+                </label>
+              </div>
+              
+              <div class="site-item">
+                <label class="checkbox-label">
+                  <input type="checkbox" value="cars.com" checked>
+                  <span class="checkbox-custom"></span>
+                  Cars.com
+                </label>
+              </div>
+              
+              <div class="site-item">
+                <label class="checkbox-label">
+                  <input type="checkbox" value="cargurus.com" checked>
+                  <span class="checkbox-custom"></span>
+                  CarGurus.com
+                </label>
+              </div>
+              
+              <div class="site-item">
+                <label class="checkbox-label">
+                  <input type="checkbox" value="dealer.com" checked>
+                  <span class="checkbox-custom"></span>
+                  Dealer.com
+                </label>
+              </div>
+            </div>
+          </div>
+          
+          <div class="settings-card">
+            <h3>Data Management</h3>
+            
+            <div class="setting-group">
+              <label for="storageLimit">Maximum stored vehicles</label>
+              <select id="storageLimit" class="setting-input">
+                <option value="25">25</option>
+                <option value="50" selected>50</option>
+                <option value="100">100</option>
+                <option value="250">250</option>
+              </select>
+            </div>
+            
+            <div class="storage-info">
+              <div class="storage-label">Storage used:</div>
+              <div class="storage-bar">
+                <div id="storageProgress" class="storage-progress"></div>
+              </div>
+              <div id="storageText" class="storage-text">0 KB of 10 MB</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="settings-actions">
+          <button id="saveSettings" class="btn btn-primary">Save Settings</button>
+          <button id="resetSettings" class="btn btn-outline">Reset to Defaults</button>
+        </div>
+      </section>
+
+      <!-- Help Section -->
+      <section id="helpSection" class="content-section hidden">
+        <div class="help-content">
+          <div class="help-card">
+            <h3>Getting Started</h3>
+            <ol>
+              <li>Navigate to a vehicle detail page on a supported automotive website</li>
+              <li>Click the extension icon and press "Scrape This Page"</li>
+              <li>Review the extracted data and click "Open FB & Autofill"</li>
+              <li>The extension will open Facebook Marketplace and auto-fill the form</li>
+            </ol>
+          </div>
+          
+          <div class="help-card">
+            <h3>Supported Websites</h3>
+            <ul>
+              <li><strong>AutoTrader.com</strong> - Full vehicle detail pages</li>
+              <li><strong>Cars.com</strong> - Individual vehicle listings</li>
+              <li><strong>CarGurus.com</strong> - Vehicle detail pages</li>
+              <li><strong>Dealer.com</strong> - Inventory pages</li>
+              <li><strong>Generic sites</strong> - Uses fallback heuristics</li>
+            </ul>
+          </div>
+          
+          <div class="help-card">
+            <h3>Troubleshooting</h3>
+            <div class="faq-item">
+              <h4>Extension not working on a page?</h4>
+              <p>Make sure you're on a vehicle detail page. The extension looks for specific patterns to identify vehicle pages.</p>
+            </div>
+            
+            <div class="faq-item">
+              <h4>Facebook autofill not working?</h4>
+              <p>Ensure you're logged into Facebook and have permission to post to Marketplace. Some fields may need manual adjustment.</p>
+            </div>
+            
+            <div class="faq-item">
+              <h4>Photos not uploading?</h4>
+              <p>If automatic upload fails, the extension will download photos to your Downloads folder for manual upload.</p>
+            </div>
+          </div>
+          
+          <div class="help-card">
+            <h3>Privacy & Security</h3>
+            <p>This extension operates entirely locally. No data is sent to external servers. All vehicle data is stored locally in your browser.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Modals -->
+    <div id="vehicleModal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modalTitle">Vehicle Details</h3>
+          <button class="modal-close">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+          <!-- Vehicle details will be inserted here -->
+        </div>
+        
+        <div class="modal-footer">
+          <button id="modalFacebookBtn" class="btn btn-primary">Open in Facebook</button>
+          <button id="modalDownloadBtn" class="btn btn-secondary">Download Photos</button>
+          <button id="modalDeleteBtn" class="btn btn-danger">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">Processing...</div>
+    </div>
+  </div>
+
+  <!-- File input for import -->
+  <input type="file" id="importFileInput" accept=".json" style="display: none;">
+
+  <script src="../core/logger.js"></script>
+  <script src="../core/storage.js"></script>
+  <script src="../core/normalize.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>
