@@ -23,6 +23,7 @@
     "jsdom": "^24.1.0",
     "@eslint/js": "^9.9.0",
     "@typescript-eslint/parser": "^8.8.1",
-    "@typescript-eslint/eslint-plugin": "^8.8.1"
+    "@typescript-eslint/eslint-plugin": "^8.8.1",
+    "globals": "^15.8.0"
   }
 }
