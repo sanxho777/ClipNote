@@ -138,9 +138,6 @@ export function buildDescription(v: Vehicle): string {
     .join('\n');
 
   const desc = v.description ? `\n\n${v.description}` : '';
-  return `${title}\n${'-' * max(10, title.length)}\n${bullets}${desc}`.replace(/\n{3,}/g, '\n\n');
+  return `${title}\n${'-'.repeat(Math.max(10, title.length))}\n${bullets}${desc}`.replace(/\n{3,}/g, '\n\n');
 }
 
-function max(a: number, b: number): number {
-  return a > b ? a : b;
-}

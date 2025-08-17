@@ -1,3 +1,4 @@
+
 import { addToInventory, lastScrape } from './core/storage';
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {

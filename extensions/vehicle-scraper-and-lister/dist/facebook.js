@@ -1,3 +1,4 @@
+
 import { autofillOnFacebook } from './core/facebook';
 import { fetchAsFiles } from './core/photos';
 import { log } from './core/logger';
