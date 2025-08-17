@@ -13,9 +13,9 @@ body {
 }
 
 .popup-container {
-  width: 380px;
-  min-height: 500px;
-  max-height: 600px;
+  width: 480px;
+  min-height: 600px;
+  max-height: 700px;
   overflow-y: auto;
   background: white;
   border-radius: 12px;
@@ -27,7 +27,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 20px 16px;
+  padding: 24px 24px 20px;
   border-bottom: 1px solid #e5e7eb;
 }
 
@@ -38,11 +38,11 @@ body {
 }
 
 .logo-icon {
-  font-size: 20px;
+  font-size: 24px;
 }
 
 .logo h1 {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
   color: #1f2937;
 }
@@ -64,14 +64,14 @@ body {
 
 /* Status Section */
 .status-section {
-  padding: 16px 20px;
+  padding: 20px 24px;
 }
 
 .status-indicator {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px;
+  gap: 16px;
+  padding: 16px;
   background: #f8fafc;
   border-radius: 8px;
   border: 1px solid #e5e7eb;
@@ -198,23 +198,23 @@ body {
 
 /* Actions */
 .actions {
-  padding: 0 20px 20px;
+  padding: 0 24px 24px;
 }
 
 .btn {
   width: 100%;
-  padding: 12px 16px;
+  padding: 14px 18px;
   border: none;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
 .btn:disabled {
