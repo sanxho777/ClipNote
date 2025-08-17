@@ -1,0 +1,166 @@
+You are a senior Chrome extension engineer. Build a **production-ready, local-only (no backend)** Chrome Extension (Manifest V3) that:
+
+NAME
+- "Vehicle Scraper & Marketplace Lister"
+
+PRIMARY GOAL
+- From any single vehicle detail page on common listing sites, **extract** all data needed to post on Facebook Marketplace (cars category), then **open** the FB Marketplace vehicle form and **auto-fill** all fields and upload listing photos.
+
+TARGET SITES (initial support)
+- AutoTrader, Cars.com, CarGurus, Dealer.com
+- Design the scraper so it’s **site-adapter based** (easy to add more sites later).
+- If a site is unknown, use **generic fallback heuristics** + Microdata/OG tags + VIN regex.
+
+DATA TO EXTRACT (required)
+- year, make, model, trim, body style
+- price (number), mileage (number), exterior color, interior color
+- transmission, drivetrain, engine, fuel type
+- VIN (17-char), stock # (if present)
+- dealer name, phone, city, state, ZIP
+- description (cleaned, readable text)
+- image URLs (full-size, all photos in gallery; dedupe; absolute URLs)
+
+FACEBOOK MARKETPLACE AUTOFILL
+- Triggered by a button in the extension UI: “Open FB & Autofill”
+- Navigate to Facebook Marketplace > **Create new vehicle listing**.
+- Autofill:
+  - Title → “{Year} {Make} {Model} {Trim}”
+  - Price → scraped price
+  - Mileage → scraped mileage
+  - VIN → scraped VIN
+  - Condition → "Used" (configurable)
+  - Vehicle details (make/model/year/body/transmission/drivetrain/fuel)
+  - Location → dealer city/state/ZIP
+  - Description → formatted, multi-line, with bullets derived from features; include stock # if present.
+- **Upload all scraped photos** programmatically into the FB photo uploader.
+- If Facebook blocks programmatic file uploads in your environment, fall back to downloading images to a temp folder and invoking the file picker via `DataTransfer` if possible; otherwise, show a one-click “Download Photos” + instructions. **Prefer fully automated upload** if feasible.
+
+UX / UI
+- Popup (compact) and Full-Page (options page) UIs using plain HTML/CSS + vanilla JS or lightweight lit—**no heavy frameworks**.
+- Modern, clean UI; dark-mode friendly.
+- Popup shows scrape summary, validation warnings, and buttons:
+  - “Scrape This Page”
+  - “Open FB & Autofill”
+  - “Download Photos”
+  - “Open Full App”
+- Full App: inventory list (last 50 scrapes), search/filter, stats (avg price, total value), export/import JSON.
+
+TECH & QUALITY BAR
+- Manifest V3 with service worker (background), content scripts, and optional options page.
+- **TypeScript** for all code. Ship a compiled `dist/` but also include source.
+- **No external network calls** (no analytics, no remote CDNs). Bundle assets locally.
+- **Robust error handling** and user-visible toasts (non-blocking).
+- **Strict ESlint + Prettier** configs; zero lint errors.
+- Include a small, fast **selector-probe** utility that:
+  1) Uses site adapters (per-domain selectors).
+  2) Falls back to semantic search (label proximity, ARIA, meta tags).
+  3) Falls back to regex (VIN: `\b[A-HJ-NPR-Z0-9]{17}\b`).
+- **Image handling:**
+  - Collect highest-res gallery images (look for `<img srcset>`, lazy loaders, background-image).
+  - Resolve relative URLs to absolute. Remove tracking params.
+  - Deduplicate by file name or pixel hash if you can compute quickly.
+
+ARCHITECTURE
+- `/src/`
+  - `/adapters/` (one file per site: `autotrader.ts`, `cars_dot_com.ts`, `cargurus.ts`, `dealer_dot_com.ts`, plus `generic.ts`)
+  - `/core/`
+    - `scrape.ts` (dispatch to adapter; fallback heuristics)
+    - `normalize.ts` (coerce units, numbers, title-case, trim text)
+    - `photos.ts` (extract & download/upload helpers)
+    - `facebook.ts` (navigation + autofill + photo upload logic)
+    - `storage.ts` (chrome.storage.sync/local)
+    - `selectors.ts` (utility probes & label proximity)
+    - `logger.ts` (debug + user toasts)
+  - `/ui/`
+    - `popup.html`, `popup.ts`, `popup.css`
+    - `options.html`, `options.ts`, `options.css`
+  - `background.ts` (service worker; message passing; downloads)
+  - `content.ts` (inject buttons/overlays on supported pages)
+  - `types.ts` (Vehicle, Dealer, Photo, ScrapeResult)
+- `/public/`
+  - icons 16/32/48/128
+- `manifest.json` (MV3)
+- `package.json`, `tsconfig.json`, `.eslintrc.cjs`, `.prettierrc`
+- `README.md` with install & test steps
+- `tests/` basic adapter tests (JS-DOM) and unit tests for normalization
+
+PERMISSIONS (minimal, explicit)
+- `"permissions": ["storage", "downloads", "scripting", "activeTab"]`
+- `"host_permissions": ["*://*.autotrader.com/*", "*://*.cars.com/*", "*://*.cargurus.com/*", "*://*/inventory/*", "*://*/vehicle/*", "*://*.dealer.com/*", "*://*.facebook.com/*", "*://facebook.com/*"]`
+- `"action": { "default_title": "Vehicle Scraper & Lister", "default_popup": "popup.html" }`
+- Add `"declarative_net_request"` only if needed to unblock image fetches; keep lean.
+
+CONTENT SECURITY POLICY
+- MV3 defaults; no `unsafe-eval`; do not require remote scripts or styles.
+
+SCRAPER STRATEGY (per site)
+- **AutoTrader (example):**
+  - Title block often has year/make/model; grab `.vehicle-title` or `<h1>`
+  - Price: `[data-cmp="firstPrice"]` or `$` number in price container
+  - Mileage: nodes matching `/[0-9,]+\s*miles?/i`
+  - Photos: gallery `<img>` with `srcset`—choose largest
+  - VIN: labeled field or regex on page text
+- **Cars.com (example):**
+  - Title: `h1[data-testid="structured-data-title"]` or similar
+  - Price: `[data-testid="price"]`
+  - Mileage: `[data-testid="mileage"]`
+  - Photos: `img[data-testid^="gallery-image"]` (largest src)
+  - VIN from specs table by label, else regex
+- **CarGurus / Dealer.com:** Create similar selectors + fallbacks.
+- Always run **normalize** step (strip commas, parse ints, title-case, USD as number).
+
+VALIDATION & WARNINGS
+- Validate VIN length=17; mileage/price numeric; year 1950–current+1.
+- If required fields missing, show non-blocking toast and **still proceed**, but highlight what’s missing.
+
+AUTOFILL IMPLEMENTATION NOTES
+- Use a **content script** injected on FB Marketplace listing form route.
+- Wait for required inputs using a robust `waitForSelector` with timeout & retries.
+- Set values via `HTMLInputElement.value` + dispatch `input`/`change` events.
+- Photo upload:
+  - Convert image URLs to `File` objects via fetch → blob → File → create `DataTransfer` → assign to `<input type="file">`.
+  - Upload **all** photos; if more than Facebook limit, use the first 20 and warn.
+- Respect FB’s dynamic DOM; retry on rerenders.
+
+OFFLINE / LOCAL-ONLY
+- No servers, no external APIs. All logic runs locally.
+- Use `chrome.downloads` for optional “Download Photos”.
+
+TESTING & ACCEPTANCE (MUST PASS)
+1) Load **Developer mode → Load unpacked** → no errors in console or manifest.
+2) On each target site vehicle detail page:
+   - Click “Scrape This Page” in popup → shows a filled preview, ≥ 5 photos when present.
+   - “Open FB & Autofill” → opens form, fills all fields correctly, uploads photos.
+3) Lint: `npm run lint` → **0 errors**.
+4) Build: `npm run build` → outputs `/dist` with compiled JS/CSS and copied `manifest.json`.
+5) ZIP packaging: `npm run package` → creates `/release/vehicle-scraper-and-lister.zip`.
+6) README includes: install steps, permissions rationale, troubleshooting, how to add a new adapter.
+
+DELIVERABLES
+- Complete project with **all source files**, plus a ready-to-install **ZIP** in `/release`.
+- Provide a **file tree** and paste **all file contents** inline in your response (separate code blocks per file) so I can recreate exactly if needed.
+
+COMMANDS & SCRIPTS (in package.json)
+- "dev": webpack/esbuild watch to `/dist`
+- "build": typecheck + build to `/dist`
+- "lint": eslint src --max-warnings 0
+- "format": prettier --write "src/**/*.{ts,tsx,css,html}"
+- "package": build → copy manifest/public → zip to `/release/*.zip`
+
+STYLE & DX
+- TypeScript strict mode ON.
+- Small utilities, no giant files; keep functions pure and tested.
+- Comments on tricky selectors and FB autofill steps.
+
+WHAT TO OUTPUT
+1) A short overview
+2) The full **manifest.json**
+3) **Every file** under `/src` and `/public` (separate code blocks per file)
+4) `package.json`, `tsconfig.json`, `.eslintrc.cjs`, `.prettierrc`, `README.md`
+5) Build instructions and the **ZIP file contents listing** so I can confirm packaging
+6) Any known limitations + workarounds
+
+IMPORTANT
+- Do **not** hand-wave features. If Facebook’s DOM changes, write defensive selectors + retries.
+- Avoid banned Chrome APIs and external calls.
+- Ensure the extension functions on **current Chrome** stable.
