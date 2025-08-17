@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Photo Editor - Vehicle Scraper</title>
+  <link rel="stylesheet" href="photo-editor.css">
+</head>
+<body>
+  <div class="photo-editor">
+    <!-- Header -->
+    <header class="editor-header">
+      <div class="header-left">
+        <button id="backBtn" class="btn btn-secondary">
+          <span class="icon">←</span> Back to Gallery
+        </button>
+        <h1>Photo Editor</h1>
+      </div>
+      <div class="header-right">
+        <button id="autoEnhanceBtn" class="btn btn-primary">
+          <span class="icon">✨</span> Auto Enhance
+        </button>
+        <button id="saveBtn" class="btn btn-success">
+          <span class="icon">💾</span> Save
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="editor-content">
+      <!-- Left Panel - Tools -->
+      <aside class="tools-panel">
+        <div class="tool-section">
+          <h3>Basic Adjustments</h3>
+          
+          <div class="control-group">
+            <label for="brightnessSlider">Brightness</label>
+            <input type="range" id="brightnessSlider" min="-100" max="100" value="0" class="slider">
+            <span id="brightnessValue">0</span>
+          </div>
+          
+          <div class="control-group">
+            <label for="contrastSlider">Contrast</label>
+            <input type="range" id="contrastSlider" min="-100" max="100" value="0" class="slider">
+            <span id="contrastValue">0</span>
+          </div>
+          
+          <div class="control-group">
+            <label for="saturationSlider">Saturation</label>
+            <input type="range" id="saturationSlider" min="-100" max="100" value="0" class="slider">
+            <span id="saturationValue">0</span>
+          </div>
+        </div>
+
+        <div class="tool-section">
+          <h3>Transform</h3>
+          
+          <div class="control-group">
+            <label>Rotate</label>
+            <div class="button-group">
+              <button id="rotate90Btn" class="btn btn-tool" title="Rotate 90°">↻</button>
+              <button id="rotate180Btn" class="btn btn-tool" title="Rotate 180°">↻↻</button>
+              <button id="rotate270Btn" class="btn btn-tool" title="Rotate 270°">↺</button>
+            </div>
+          </div>
+          
+          <div class="control-group">
+            <label>Crop</label>
+            <button id="cropBtn" class="btn btn-tool">
+              <span class="icon">✂️</span> Crop Tool
+            </button>
+          </div>
+        </div>
+
+        <div class="tool-section">
+          <h3>Filters</h3>
+          
+          <div class="filter-grid">
+            <button class="filter-btn active" data-filter="none">
+              <div class="filter-preview"></div>
+              <span>Original</span>
+            </button>
+            <button class="filter-btn" data-filter="vibrant">
+              <div class="filter-preview filter-vibrant"></div>
+              <span>Vibrant</span>
+            </button>
+            <button class="filter-btn" data-filter="vintage">
+              <div class="filter-preview filter-vintage"></div>
+              <span>Vintage</span>
+            </button>
+            <button class="filter-btn" data-filter="blackwhite">
+              <div class="filter-preview filter-bw"></div>
+              <span>B&W</span>
+            </button>
+            <button class="filter-btn" data-filter="sepia">
+              <div class="filter-preview filter-sepia"></div>
+              <span>Sepia</span>
+            </button>
+            <button class="filter-btn" data-filter="cool">
+              <div class="filter-preview filter-cool"></div>
+              <span>Cool</span>
+            </button>
+            <button class="filter-btn" data-filter="warm">
+              <div class="filter-preview filter-warm"></div>
+              <span>Warm</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="tool-section">
+          <h3>Resize</h3>
+          
+          <div class="control-group">
+            <label for="widthInput">Width (px)</label>
+            <input type="number" id="widthInput" class="number-input" min="100" max="4000">
+          </div>
+          
+          <div class="control-group">
+            <label for="heightInput">Height (px)</label>
+            <input type="number" id="heightInput" class="number-input" min="100" max="4000">
+          </div>
+          
+          <div class="control-group">
+            <label>
+              <input type="checkbox" id="maintainAspectRatio" checked>
+              Maintain aspect ratio
+            </label>
+          </div>
+          
+          <div class="control-group">
+            <label for="qualitySlider">Quality</label>
+            <input type="range" id="qualitySlider" min="10" max="100" value="90" class="slider">
+            <span id="qualityValue">90%</span>
+          </div>
+        </div>
+
+        <div class="tool-section">
+          <h3>Batch Actions</h3>
+          
+          <button id="createVariationsBtn" class="btn btn-secondary btn-full">
+            <span class="icon">🎨</span> Create Variations
+          </button>
+          
+          <button id="batchApplyBtn" class="btn btn-secondary btn-full">
+            <span class="icon">📋</span> Apply to All Photos
+          </button>
+        </div>
+
+        <!-- Reset Controls -->
+        <div class="tool-section">
+          <button id="resetBtn" class="btn btn-warning btn-full">
+            <span class="icon">↶</span> Reset All
+          </button>
+        </div>
+      </aside>
+
+      <!-- Center Panel - Image Canvas -->
+      <main class="canvas-area">
+        <div class="canvas-container">
+          <canvas id="editCanvas" class="edit-canvas"></canvas>
+          
+          <!-- Crop overlay (hidden by default) -->
+          <div id="cropOverlay" class="crop-overlay hidden">
+            <div class="crop-selection">
+              <div class="crop-handle top-left"></div>
+              <div class="crop-handle top-right"></div>
+              <div class="crop-handle bottom-left"></div>
+              <div class="crop-handle bottom-right"></div>
+            </div>
+          </div>
+          
+          <!-- Loading indicator -->
+          <div id="loadingIndicator" class="loading-indicator hidden">
+            <div class="spinner"></div>
+            <p>Processing image...</p>
+          </div>
+        </div>
+        
+        <!-- Canvas Controls -->
+        <div class="canvas-controls">
+          <button id="zoomInBtn" class="btn btn-tool" title="Zoom In">🔍+</button>
+          <button id="zoomOutBtn" class="btn btn-tool" title="Zoom Out">🔍-</button>
+          <button id="fitToScreenBtn" class="btn btn-tool" title="Fit to Screen">⬜</button>
+          <span class="zoom-level">100%</span>
+        </div>
+      </main>
+
+      <!-- Right Panel - Photo List -->
+      <aside class="photos-panel">
+        <div class="panel-header">
+          <h3>Photos</h3>
+          <button id="addPhotosBtn" class="btn btn-sm btn-primary">+ Add</button>
+        </div>
+        
+        <div class="photos-list" id="photosList">
+          <!-- Photos will be populated here -->
+        </div>
+        
+        <!-- Photo variations (shown when created) -->
+        <div id="variationsSection" class="variations-section hidden">
+          <h4>Variations</h4>
+          <div class="variations-grid" id="variationsGrid">
+            <!-- Variations will be populated here -->
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- History Panel (expandable) -->
+    <div class="history-panel" id="historyPanel">
+      <div class="history-header">
+        <h4>Edit History</h4>
+        <button id="toggleHistoryBtn" class="btn btn-sm">▼</button>
+      </div>
+      <div class="history-content" id="historyContent">
+        <div class="history-item active">
+          <span class="history-action">Original</span>
+          <button class="btn btn-xs">Revert</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import Photo Input -->
+  <input type="file" id="photoFileInput" accept="image/*" multiple style="display: none;">
+
+  <script src="photo-editor.js"></script>
+</body>
+</html>

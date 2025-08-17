@@ -23,6 +23,7 @@ declare class OptionsManager {
     openInFacebook(id: string): Promise<void>;
     private createVehicleDetailsHTML;
     private closeModal;
+    private openPhotoEditor;
     private downloadPhotos;
     private deleteVehicle;
     private exportData;

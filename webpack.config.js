@@ -13,7 +13,8 @@ module.exports = (env, argv) => {
       background: './src/background.ts',
       content: './src/content.ts',
       popup: './src/ui/popup.ts',
-      options: './src/ui/options.ts'
+      options: './src/ui/options.ts',
+      'photo-editor': './src/ui/photo-editor.ts'
     },
     
     output: {

@@ -70,10 +70,12 @@ class OptionsManager {
     const exportBtn = document.getElementById('exportBtn');
     const importBtn = document.getElementById('importBtn');
     const clearBtn = document.getElementById('clearBtn');
+    const photoEditorBtn = document.getElementById('openPhotoEditorBtn');
 
     exportBtn?.addEventListener('click', () => this.exportData());
     importBtn?.addEventListener('click', () => this.importData());
     clearBtn?.addEventListener('click', () => this.clearAllData());
+    photoEditorBtn?.addEventListener('click', () => this.openPhotoEditor());
 
     // Settings
     const saveSettings = document.getElementById('saveSettings');
@@ -569,6 +571,11 @@ class OptionsManager {
   private closeModal(): void {
     const modal = document.getElementById('vehicleModal');
     modal?.classList.add('hidden');
+  }
+
+  private openPhotoEditor(): void {
+    this.logger.info('Opening photo editor');
+    chrome.tabs.create({ url: chrome.runtime.getURL('src/ui/photo-editor.html') });
   }
 
   private async downloadPhotos(id: string): Promise<void> {
